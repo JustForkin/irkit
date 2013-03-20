@@ -1,7 +1,7 @@
 ################################################################################
-import datetime, os, time, argparse, multiprocessing, subprocess
+import datetime, os, time, argparse, multiprocessing, subprocess, sender, scp
 DEFAULT_NUM         = 5
-DEFAULT_DELAY       = 5
+DEFAULT_DELAY       = 10
 #DEFAULT_RESOLUTION  = "1280x1024"
 DEFAULT_RESOLUTION  = "320x240"
 DEFAULT_PNG_COMPRESSION = 9 # (-1,0-10)
@@ -90,6 +90,26 @@ class Application:
             self.capture(filename_prefix = filename_prefix, 
                          filename_suffix = filename_suffix,
                         )
+
+            remotepath='pvos.org/ircam/latest.png'
+            baseDir="./imgs"
+            server='habeo.net'
+            user='asine'
+            password='habeocat999'
+            print "Sending ..."
+            sender.sendMostRecentFile(baseDir, remotepath,server,user,password)
+            """
+            files=os.listdir(baseDir)
+            #print files
+            latestFile=sender.getRecentfile(baseDir,files)
+            #print latestFile
+            ssh = sender.createSSHClient(server=server, user=user, password=password)
+            #print ssh
+            print "Sending ..."
+            scp1 = scp.SCPClient(ssh.get_transport())
+            scp1.put(latestFile,'pvos.org/ircam/latest.png')
+            """
+
             if not (i == num-1):
                 time.sleep(delay)
 ################################################################################

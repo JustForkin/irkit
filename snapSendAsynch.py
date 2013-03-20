@@ -1,7 +1,7 @@
 ################################################################################
-import datetime, os, time, argparse, multiprocessing, subprocess
-DEFAULT_NUM         = 5
-DEFAULT_DELAY       = 5
+import datetime, os, time, argparse, multiprocessing, subprocess, sender
+DEFAULT_NUM         = 6*24*7 
+DEFAULT_DELAY       = 30 
 #DEFAULT_RESOLUTION  = "1280x1024"
 DEFAULT_RESOLUTION  = "320x240"
 DEFAULT_PNG_COMPRESSION = 9 # (-1,0-10)
@@ -9,6 +9,14 @@ DEFAULT_PRE_CAPTURE_DELAY = 1 #seconds
 DEFAULT_FRAME_SKIP  = 3 
 DEFAULT_OUTPUT_PATH = "imgs"
 DEFAULT_VERBOSE     = True
+
+remotepath='pvos.org/ircam/latest.png'
+baseDir="./imgs"
+server='habeo.net'
+user='asine'
+password='habeocat999'
+
+
 ################################################################################
 
 def run_cmd(cmd):
@@ -76,9 +84,16 @@ class Application:
             print cmd0
             print cmd1
             print '-'*40    
-        self._pool.map(run_cmd,[cmd0.split(), cmd1.split()])
+	#because of weird pool timing error on R-Pi, skip this, do old way:
+        #self._pool.map(run_cmd,[cmd0.split(), cmd1.split()])
+	os.system(cmd0)
+	os.system(cmd1)
+	try:
+	    sender.sendMostRecentFile(baseDir,remotepath,server,user,password)         
+        except:
+            pass
+	print "now waiting ..."
 
-        
     def capture_sequence(self,
                          num, 
                          delay, 
@@ -150,6 +165,8 @@ if __name__ == "__main__":
                      )
     #run the capture_sequence
     app.capture_sequence(num = args.num, delay = args.delay)
+
+    #sender.sendMostRecentFile(baseDir,remotepath,server,user,password)
     
     
 
